@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Queer Punjab 2026</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- HTML2Canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Auto-Translate Logic (Hidden) -->
+    <script>
+        const userLang = navigator.language || navigator.userLanguage;
+        const shortLang = userLang.split('-')[0];
+        if (shortLang !== 'en') {
+            document.cookie = `googtrans=/en/${shortLang}; path=/`;
+        }
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <style>
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        body { -webkit-tap-highlight-color: transparent; background-color: #f8fafc; }
+        
+        .gradient-bg { background: linear-gradient(135deg, #9333ea 0%, #4f46e5 100%); }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-top: 1px solid #f1f5f9; }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .nav-active { color: #9333ea; }
+        .nav-inactive { color: #94a3b8; }
+        
+        .expand-content { transition: max-height 0.3s ease-out, padding 0.3s ease; max-height: 0; overflow: hidden; padding-top: 0; padding-bottom: 0; }
+        .expanded { max-height: 500px; padding-top: 1rem; padding-bottom: 1rem; }
+
+        button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible {
+            outline: 2px solid #9333ea; outline-offset: 2px;
+        }
+
+        /* Completely hide Google Translate UI Elements */
+        .goog-te-banner-frame { display: none !important; }
+        body { top: 0px !important; }
+        .goog-tooltip { display: none !important; }
+        .goog-tooltip:hover { display: none !important; }
+        .goog-text-highlight { background-color: transparent !important; border: none !important; box-shadow: none !important; }
+        #google_translate_element { display: none !important; }
+    </style>
+</head>
+<body class="text-slate-800 font-sans flex flex-col h-screen overflow-hidden selection:bg-purple-200">
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast-modal" class="fixed top-4 left-0 right-0 z-[100] flex justify-center hidden fade-in pointer-events-none" aria-live="polite">
+        <div class="bg-slate-900 text-white px-6 py-3 rounded-full shadow-xl font-bold text-sm tracking-wide text-center">
+            <span id="toast-msg">Message</span>
+        </div>
+    </div>
+
+    <!-- AI FULLSCREEN INPUT OVERLAY -->
+    <div id="ai-fullscreen-modal" class="fixed inset-0 bg-white z-[110] hidden flex-col fade-in">
+        <div class="flex justify-between items-center p-4 border-b border-slate-100 bg-slate-50">
+            <button onclick="closeAiFullscreen()" class="px-4 py-2 text-slate-500 font-bold uppercase tracking-widest text-[10px] hover:bg-slate-200 rounded-full transition-colors active:scale-95" aria-label="Cancel">
+                Cancel
+            </button>
+            <!-- Send button anchored safely in top right header -->
+            <button onclick="sendAiMessageFromFullscreen()" class="flex items-center gap-1.5 px-6 py-2 bg-purple-600 text-white font-black uppercase tracking-widest text-[10px] rounded-full shadow-md hover:bg-purple-700 transition-colors active:scale-95" aria-label="Send">
+                <span>Send</span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5"><path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" /></svg>
+            </button>
+        </div>
+        <div class="flex-1 p-5 relative bg-white">
+            <textarea id="ai-input-large" class="w-full h-full resize-none outline-none text-xl lg:text-2xl font-medium text-slate-800 placeholder-slate-300 bg-transparent pt-2" placeholder="Type a message, ask to filter data, or request a specific chart..."></textarea>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTENT -->
+    <div id="screen-app" class="flex-1 flex flex-col h-full relative fade-in bg-slate-50">
+        
+        <!-- FIXED HEADER -->
+        <header id="app-header" onclick="setTab('dashboard')" class="fixed top-0 left-0 w-full p-4 flex justify-center items-center bg-white/95 backdrop-blur-md z-40 cursor-pointer shadow-sm border-b border-slate-100">
+            <div class="flex flex-col leading-none text-center">
+                <span class="font-black text-xl md:text-[22px] text-slate-900 tracking-tight leading-none mb-1">Queer</span>
+                <span class="font-black text-xl md:text-[22px] text-purple-600 tracking-tight leading-none">ਪੰਜਾਬ</span>
+            </div>
+            <!-- Hidden translate element -->
+            <div id="google_translate_element"></div>
+        </header>
+
+        <!-- MAIN SCROLL AREA -->
+        <main class="flex-1 overflow-y-auto w-full pt-20 pb-28" id="main-scroll-area" tabindex="-1">
+            <div class="w-full h-full flex flex-col">
+                
+                <!-- TAB: DASHBOARD -->
+                <div id="tab-dashboard" class="tab-content fade-in flex-1 flex flex-col max-w-3xl mx-auto w-full px-4" role="tabpanel" aria-labelledby="nav-dash">
+                    
+                    <div class="gradient-bg rounded-[2rem] p-8 text-white shadow-lg mb-6 relative overflow-hidden shrink-0">
+                        <div class="relative z-10">
+                            <p class="text-[10px] md:text-xs font-black opacity-80 uppercase tracking-widest mb-1">LGBTQIA+ Census Punjab 2026</p>
+                            <h2 class="text-6xl md:text-7xl font-black mb-6 tracking-tight" id="stat-total">0</h2>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-white/20 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+                                    <p class="text-[9px] md:text-[10px] font-black uppercase opacity-80 mb-1">LGBTQIA+</p>
+                                    <p class="text-2xl md:text-3xl font-black text-yellow-300" id="stat-lgbt">0</p>
+                                </div>
+                                <div class="bg-white/20 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+                                    <p class="text-[9px] md:text-[10px] font-black uppercase opacity-80 mb-1">Allies</p>
+                                    <p class="text-2xl md:text-3xl font-black text-green-300" id="stat-ally">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-[2rem] border border-slate-200 shadow-sm mb-6 shrink-0">
+                        
+                        <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-4">
+                            <!-- View Toggles -->
+                            <div class="flex bg-slate-100 rounded-lg p-1" role="group" aria-label="View toggle">
+                                <button onclick="setViewType('list')" id="view-list" class="px-3 py-1 text-[10px] md:text-xs font-black uppercase rounded-md bg-white shadow-sm text-slate-800" aria-pressed="true">List</button>
+                                <button onclick="setViewType('chart')" id="view-chart" class="px-3 py-1 text-[10px] md:text-xs font-black uppercase rounded-md text-slate-500 hover:text-slate-800" aria-pressed="false">Chart</button>
+                            </div>
+                            
+                            <!-- Download Chart Button (Icon Only) -->
+                            <button onclick="downloadDataImage()" class="flex items-center justify-center w-8 h-8 text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors active:scale-95 shadow-sm" aria-label="Download Image" title="Download Image">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            </button>
+                        </div>
+                        
+                        <!-- Breakdown Pills -->
+                        <div class="mb-4">
+                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Show Breakdown Of:</p>
+                            <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar" role="radiogroup">
+                                <button onclick="setGrouping('districts')" id="grp-districts" class="whitespace-nowrap px-4 py-2 border rounded-full text-xs font-black uppercase tracking-wider transition-colors bg-purple-600 text-white border-purple-600" aria-checked="true">District</button>
+                                <button onclick="setGrouping('genders')" id="grp-genders" class="whitespace-nowrap px-4 py-2 border rounded-full text-xs font-black uppercase tracking-wider transition-colors bg-slate-50 text-slate-600 border-slate-200" aria-checked="false">Gender</button>
+                                <button onclick="setGrouping('sexualities')" id="grp-sexualities" class="whitespace-nowrap px-4 py-2 border rounded-full text-xs font-black uppercase tracking-wider transition-colors bg-slate-50 text-slate-600 border-slate-200" aria-checked="false">Sexuality</button>
+                            </div>
+                        </div>
+
+                        <!-- Advanced Multi-Filter Pills -->
+                        <div class="mb-2">
+                            <div class="flex justify-between items-center mb-2 px-1">
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Filter Data By:</p>
+                                <button onclick="clearAllFilters()" id="btn-clear-all" class="hidden text-[9px] font-black uppercase text-purple-600 bg-purple-50 hover:bg-purple-100 px-2 py-1 rounded transition-colors active:scale-95 shadow-sm">
+                                    Clear Filters
+                                </button>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[8px] font-bold text-slate-400 uppercase w-[50px] shrink-0">Dist.</span>
+                                    <div class="flex gap-2 overflow-x-auto no-scrollbar" id="filter-row-dist" role="group" aria-label="District Filters"></div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[8px] font-bold text-slate-400 uppercase w-[50px] shrink-0">Gen.</span>
+                                    <div class="flex gap-2 overflow-x-auto no-scrollbar" id="filter-row-gen" role="group" aria-label="Gender Filters"></div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[8px] font-bold text-slate-400 uppercase w-[50px] shrink-0">Sex.</span>
+                                    <div class="flex gap-2 overflow-x-auto no-scrollbar" id="filter-row-sex" role="group" aria-label="Sexuality Filters"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Data Display Area -->
+                        <div class="mt-4 relative pb-2 border-t border-slate-100 pt-4 min-h-[150px]">
+                            <div id="data-list-view" class="space-y-2"></div>
+                            
+                            <div id="data-chart-view" class="hidden w-full flex-col">
+                                <div class="h-64 relative w-full flex justify-center items-center" id="chart-container">
+                                    <canvas id="mainChart" aria-label="Data Chart" role="img"></canvas>
+                                </div>
+                                <div class="border-t border-slate-100 mt-6 pt-3 flex justify-between items-center px-1">
+                                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Value Format</span>
+                                    <div class="flex bg-slate-100 rounded-lg p-1 shadow-sm border border-slate-200">
+                                        <button onclick="setFormatType('pct')" id="format-pct" class="px-3 py-1 text-[10px] font-black uppercase rounded-md bg-white shadow-sm text-slate-800">%</button>
+                                        <button onclick="setFormatType('num')" id="format-num" class="px-3 py-1 text-[10px] font-black uppercase rounded-md text-slate-500 hover:text-slate-800">123</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Footer Elements -->
+                    <div class="mt-auto pt-4 pb-8 text-center shrink-0 flex flex-col items-center">
+                        <a href="mailto:mail.queerpunjab@gmail.com?subject=Queer%20Punjab%20Feedback" class="text-xs font-bold text-slate-400 hover:text-purple-600 transition-colors uppercase tracking-widest underline decoration-dotted mb-3 inline-block">Contact Us</a>
+                        <p class="font-bold text-[11px] text-slate-300 tracking-widest uppercase">Queer ਪੰਜਾਬ © 2023-2026</p>
+                    </div>
+                </div>
+
+                <!-- TAB: FORM -->
+                <div id="tab-form" class="tab-content hidden fade-in flex-1 flex flex-col max-w-xl mx-auto w-full px-4" role="tabpanel" aria-labelledby="nav-form">
+                    
+                    <!-- LOCATION BLOCKED VIEW -->
+                    <div id="location-block-view" class="hidden bg-white p-6 md:p-8 rounded-[2rem] border border-slate-200 shadow-sm text-center mb-6">
+                        <h3 class="font-black text-xl text-slate-800 mb-2">Location Notice</h3>
+                        <p class="text-sm text-slate-500 mb-6 font-medium leading-relaxed">As per your IP, you are currently outside Punjab or Chandigarh. This census is strictly for residents of Punjab.</p>
+                        
+                        <button onclick="shareApp()" class="w-full py-4 mb-4 gradient-bg text-white font-black rounded-[1.5rem] active:scale-95 transition-transform uppercase tracking-widest text-xs shadow-md">Share Census Link</button>
+                        
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed">If this is a mistake (e.g., using a VPN or mobile network routing), please use the Contact Us button below.</p>
+                    </div>
+
+                    <!-- MY SUBMISSION VIEW -->
+                    <div id="my-submission-view" class="hidden bg-white p-6 md:p-8 rounded-[2rem] border border-slate-200 shadow-sm text-center mb-6">
+                        <h3 class="font-black text-xl text-slate-800 mb-2">Counted Successfully!</h3>
+                        <p class="text-sm text-slate-500 mb-6 font-medium">Thank you for participating.</p>
+                        
+                        <div class="space-y-3 text-left bg-slate-50 p-5 rounded-[1.5rem] mb-6 border border-slate-100">
+                            <p class="text-sm"><span class="font-bold text-slate-400 uppercase text-[10px] tracking-widest block mb-1">District</span> <span id="my-entry-dist" class="font-black text-slate-800">...</span></p>
+                            <p class="text-sm"><span class="font-bold text-slate-400 uppercase text-[10px] tracking-widest block mb-1">Gender</span> <span id="my-entry-g" class="font-black text-slate-800">...</span></p>
+                            <p class="text-sm"><span class="font-bold text-slate-400 uppercase text-[10px] tracking-widest block mb-1">Sexuality</span> <span id="my-entry-s" class="font-black text-slate-800">...</span></p>
+                        </div>
+                        
+                        <div class="flex gap-2">
+                            <button id="btn-edit-entry" onclick="enableEdit()" class="flex-1 py-4 border-2 border-purple-600 text-purple-700 font-black rounded-[1.5rem] active:scale-95 transition-transform uppercase tracking-widest text-xs focus:outline-none focus:ring-2 focus:ring-purple-500">Edit Entry</button>
+                            <button onclick="deleteMyCount()" class="w-14 flex items-center justify-center border-2 border-red-500 text-red-500 rounded-[1.5rem] active:scale-95 transition-transform bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500" aria-label="Delete Count" title="Delete Data">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ACTUAL FORM -->
+                    <div id="actual-form-view" class="mb-6">
+                        <h2 class="text-center text-xl font-semibold text-slate-800 tracking-tight mb-6">Self-count form</h2>
+                        
+                        <form id="census-form" onsubmit="handleFormSubmit(event)" class="space-y-5">
+                            
+                            <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
+                                <fieldset>
+                                    <legend class="font-black text-slate-800 mb-4 uppercase text-[10px] tracking-widest w-full">1. Gender Identity</legend>
+                                    <div id="gender-grid" class="grid grid-cols-2 gap-3"></div>
+                                    
+                                    <div id="sub-trans" class="hidden mt-4 p-4 bg-slate-50 border border-slate-200 rounded-xl relative">
+                                        <div id="gender-trans-grid" class="grid grid-cols-2 gap-2 mb-2"></div>
+                                        <div class="flex justify-end hidden mt-3 border-t border-slate-200 pt-3" id="sub-trans-clear-container">
+                                            <button type="button" onclick="clearTransSub()" aria-label="Clear sub-category" class="flex items-center justify-center w-8 h-8 bg-purple-100 hover:bg-purple-200 text-purple-600 rounded-lg transition-colors shadow-sm">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div id="sub-more-gender" class="hidden mt-4">
+                                        <label for="input-more-gender" class="sr-only">Specify Gender</label>
+                                        <input type="text" id="input-more-gender" placeholder="e.g., Genderfluid, Agender..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:border-purple-500 font-medium">
+                                    </div>
+                                </fieldset>
+                            </div>
+
+                            <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
+                                <fieldset>
+                                    <legend class="font-black text-slate-800 mb-4 uppercase text-[10px] tracking-widest w-full">2. Sexual Identity</legend>
+                                    <div id="sexuality-grid" class="grid grid-cols-2 gap-3"></div>
+                                    <div id="sub-more-sexuality" class="hidden mt-4">
+                                        <label for="input-more-sexuality" class="sr-only">Specify Sexuality</label>
+                                        <input type="text" id="input-more-sexuality" placeholder="e.g., Demisexual, Queer..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:border-purple-500 font-medium">
+                                    </div>
+                                </fieldset>
+                            </div>
+
+                            <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
+                                <label for="district-select" class="font-black text-slate-800 mb-4 uppercase text-[10px] tracking-widest block">3. Your District</label>
+                                <select id="district-select" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-bold text-sm text-slate-800 outline-none focus:border-purple-500"></select>
+                            </div>
+                            
+                            <button type="submit" id="btn-submit" class="w-full py-5 gradient-bg text-white font-black rounded-[1.5rem] shadow-lg uppercase tracking-widest text-sm active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">Submit Count</button>
+                        </form>
+                    </div>
+
+                    <div class="mt-auto pb-8 text-center shrink-0 flex flex-col items-center">
+                        <a href="mailto:mail.queerpunjab@gmail.com?subject=Queer%20Punjab%20Feedback" class="text-xs font-bold text-slate-400 hover:text-purple-600 transition-colors uppercase tracking-widest underline decoration-dotted mb-3 inline-block">Contact Us</a>
+                        <p class="font-bold text-[11px] text-slate-300 tracking-widest uppercase">Queer ਪੰਜਾਬ © 2023-2026</p>
+                    </div>
+                </div>
+
+                <!-- TAB: NATIVE AI CHAT -->
+                <div id="tab-ai" class="tab-content hidden fade-in flex-1 flex flex-col w-full absolute inset-0 pt-20 pb-[72px] bg-slate-50" role="tabpanel" aria-labelledby="nav-ai">
+                    
+                    <!-- Chat History Area -->
+                    <div id="chat-history" class="flex-1 overflow-y-auto p-4 md:p-5 space-y-5 text-sm font-medium">
+                        <div class="flex justify-start fade-in mt-4">
+                            <div class="bg-white text-slate-700 p-4 max-w-[85%] rounded-2xl rounded-tl-none leading-relaxed shadow-sm border border-slate-200">
+                                Hello! I am the AI for the Queer Punjab Census. I can filter, analyze the live data, or generate custom charts for you. What would you like to see?
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Input Area touching edges natively -->
+                    <div class="bg-white border-t border-slate-200 p-3 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] pb-safe">
+                        <div class="flex gap-2 overflow-x-auto pb-3 no-scrollbar" id="ai-chips">
+                            <!-- Dynamic Chips -->
+                        </div>
+                        <div class="relative">
+                            <div onclick="openAiFullscreen()" class="w-full bg-slate-50 border border-slate-200 rounded-full px-5 py-3.5 text-sm text-slate-400 cursor-text hover:bg-slate-100 transition-colors flex items-center justify-between">
+                                <span>Type to ask or chart...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- BOTTOM NAV -->
+        <nav class="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md py-2 flex justify-center items-center z-50 pb-safe border-t border-slate-200">
+            <div class="max-w-md w-full flex justify-around">
+                <button onclick="setTab('dashboard')" class="nav-btn w-full flex flex-col items-center nav-active" id="nav-dash" aria-label="Data Dashboard">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mb-1"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+                    <span class="text-[9px] font-black uppercase tracking-wider">Data</span>
+                </button>
+                <button onclick="setTab('form')" class="nav-btn w-full flex flex-col items-center nav-inactive" id="nav-form" aria-label="Count Form">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mb-1"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                    <span class="text-[9px] font-black uppercase tracking-wider">Count Me</span>
+                </button>
+                <button onclick="setTab('ai')" class="nav-btn w-full flex flex-col items-center nav-inactive" id="nav-ai" aria-label="AI Assistant">
+                    <span class="text-[16px] font-sans font-black tracking-tighter mb-1 leading-none mt-1">Ai</span>
+                    <span class="text-[9px] font-black uppercase tracking-wider">Ai</span>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <!-- CORE LOGIC & FIREBASE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app-check.js";
+        import { getFirestore, doc, onSnapshot, setDoc, updateDoc, increment, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+        const apiKey = ""; 
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'queer-punjab';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyD8oq2HebsBFypoYq8s4goDoWccVP0hGAc",
+            authDomain: "queerpunjab.firebaseapp.com",
+            projectId: "queerpunjab",
+            storageBucket: "queerpunjab.firebasestorage.app",
+            messagingSenderId: "94929344900",
+            appId: "1:94929344900:web:07dc66575ea142632d65d1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        let user = null;
+        let flatData = []; 
+        let globalTotals = { total: 0, lgbt: 0, ally: 0 };
+        let mySubmission = null; 
+        
+        let currentGrouping = 'districts'; 
+        let activeFilters = { districts: [], genders: [], sexualities: [] }; 
+        let showAllDistricts = false;
+
+        let currentView = 'list'; 
+        let currentFormat = 'pct'; 
+        let mainChartInstance = null;
+
+        // IP Geolocation Check
+        let isLocationValid = true;
+        let locationChecked = false;
+
+        if (typeof __initial_auth_token !== 'undefined') {
+            try { initializeAppCheck(app, { provider: new ReCaptchaV3Provider("PASTE_KEY_HERE"), isTokenAutoRefreshEnabled: true }); } catch(e){}
+        }
+
+        const DISTRICTS = ["Amritsar", "Barnala", "Bathinda", "Chandigarh", "Faridkot", "Fatehgarh Sahib", "Fazilka", "Ferozepur", "Gurdaspur", "Hoshiarpur", "Jalandhar", "Kapurthala", "Ludhiana", "Malerkotla", "Mansa", "Moga", "Pathankot", "Patiala", "Rupnagar", "Mohali", "Nawanshahr", "Sangrur", "Sri Muktsar Sahib", "Tarn Taran"];
+        const GENDER_OPTS = [ {id:'Man'}, {id:'Woman'}, {id:'Transgender'}, {id:'Non-binary'}, {id:'Intersex'}, {id:'More'} ];
+        const TRANS_OPTS = [ {id:'Transman'}, {id:'Transwoman'}, {id:'Non-binary'} ];
+        const SEXUALITY_OPTS = [ {id:'Gay'}, {id:'Lesbian'}, {id:'Bisexual'}, {id:'Pansexual'}, {id:'Asexual'}, {id:'Heterosexual'}, {id:'More'} ];
+
+        window.showToast = (msg) => {
+            const t = document.getElementById('toast-modal'); 
+            document.getElementById('toast-msg').innerText = msg;
+            t.classList.remove('hidden'); setTimeout(() => t.classList.add('hidden'), 3500);
+        };
+
+        const initUI = () => {
+            const buildGrid = (id, list, name, onChangeFn) => {
+                document.getElementById(id).innerHTML = list.map(opt => `
+                    <label class="p-3 border border-slate-200 rounded-xl flex items-center gap-3 cursor-pointer bg-slate-50 hover:bg-purple-50 transition-colors focus-within:ring-2 focus-within:ring-purple-500">
+                        <input type="radio" name="${name}" value="${opt.id}" onchange="${onChangeFn}('${opt.id}')" class="accent-purple-600 w-4 h-4">
+                        <span class="text-xs font-bold text-slate-700">${opt.id}</span>
+                    </label>`).join('');
+            };
+            buildGrid('gender-grid', GENDER_OPTS, 'gender', 'handleGenderChange');
+            buildGrid('gender-trans-grid', TRANS_OPTS, 'gender_trans', 'handleTransSubChange');
+            buildGrid('sexuality-grid', SEXUALITY_OPTS, 'sexuality', 'handleSexualityChange');
+            document.getElementById('district-select').innerHTML = `<option value="" disabled selected>-- Select --</option>` + DISTRICTS.map(dist => `<option value="${dist}">${dist}</option>`).join('');
+            
+            renderFilterPills();
+            renderAiChips();
+            updateDataDisplay(); 
+        };
+
+        window.onload = async () => {
+            initUI();
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
+                else await signInAnonymously(auth);
+            } catch(e) {}
+        };
+
+        onAuthStateChanged(auth, async (u) => { 
+            if (u) { 
+                user = u; 
+                syncData(); 
+                const myDoc = await getDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'submissions', 'entry'));
+                if(myDoc.exists()) {
+                    mySubmission = myDoc.data();
+                    renderMySubmissionView();
+                    renderFilterPills(); 
+                    renderAiChips();
+                }
+            } 
+        });
+
+        // IP Check function
+        const verifyLocation = async () => {
+            if(locationChecked) return;
+            try {
+                const res = await fetch('https://get.geojs.io/v1/ip/geo.json');
+                const data = await res.json();
+                const region = data.region || "";
+                if (region.includes("Punjab") || region.includes("Chandigarh")) {
+                    isLocationValid = true;
+                } else {
+                    isLocationValid = false;
+                }
+            } catch(e) {
+                isLocationValid = true; // Default allow if API blocked by adblockers
+            }
+            locationChecked = true;
+        };
+
+        window.setTab = async (t) => {
+            ['dashboard', 'form', 'ai'].forEach(tab => document.getElementById(`tab-${tab}`).classList.add('hidden'));
+            document.getElementById(`tab-${t}`).classList.remove('hidden');
+            
+            const navMap = { 'dashboard': 'dash', 'form': 'form', 'ai': 'ai' };
+            const activeId = navMap[t];
+
+            ['dash', 'form', 'ai'].forEach(id => {
+                const el = document.getElementById(`nav-${id}`);
+                if(el) {
+                    if (id === activeId) {
+                        el.classList.add('nav-active');
+                        el.classList.remove('nav-inactive');
+                    } else {
+                        el.classList.remove('nav-active');
+                        el.classList.add('nav-inactive');
+                    }
+                }
+            });
+            
+            // Handle location blocking for form tab
+            if (t === 'form') {
+                if (!locationChecked) {
+                    showToast("Verifying location securely...");
+                    await verifyLocation();
+                }
+                
+                if (!isLocationValid && !mySubmission) {
+                    document.getElementById('actual-form-view').classList.add('hidden');
+                    document.getElementById('my-submission-view').classList.add('hidden');
+                    document.getElementById('location-block-view').classList.remove('hidden');
+                } else {
+                    document.getElementById('location-block-view').classList.add('hidden');
+                    if (mySubmission) {
+                        document.getElementById('my-submission-view').classList.remove('hidden');
+                        document.getElementById('actual-form-view').classList.add('hidden');
+                    } else {
+                        document.getElementById('my-submission-view').classList.add('hidden');
+                        document.getElementById('actual-form-view').classList.remove('hidden');
+                    }
+                }
+            }
+
+            if (t !== 'ai') {
+                document.getElementById('main-scroll-area').scrollTo({top: 0, behavior: 'smooth'});
+            } else {
+                const chatHist = document.getElementById('chat-history');
+                chatHist.scrollTop = chatHist.scrollHeight;
+            }
+        };
+
+        window.shareApp = () => {
+            const shareData = {
+                title: 'Queer Punjab 2026',
+                text: 'Take part in the LGBTQIA+ Census of Punjab 2026 anonymously based on self-count. Ensure our community is represented! 🏳️‍🌈\n\n',
+                url: 'https://queerpunjab.github.io/QueerPunjab'
+            };
+            if (navigator.share) {
+                navigator.share(shareData).catch(console.error);
+            } else {
+                navigator.clipboard.writeText(shareData.text + shareData.url);
+                showToast("Link copied to clipboard!");
+            }
+        };
+
+        window.handleGenderChange = (val) => {
+            document.getElementById('sub-trans').classList.toggle('hidden', val !== 'Transgender');
+            document.getElementById('sub-more-gender').classList.toggle('hidden', val !== 'More');
+        };
+        window.handleTransSubChange = () => {
+            document.getElementById('sub-trans-clear-container').classList.remove('hidden');
+        };
+        window.handleSexualityChange = (val) => {
+            document.getElementById('sub-more-sexuality').classList.toggle('hidden', val !== 'More');
+        };
+        window.clearTransSub = () => {
+            const els = document.getElementsByName('gender_trans');
+            for(let i=0; i<els.length; i++) els[i].checked = false;
+            document.getElementById('sub-trans-clear-container').classList.add('hidden');
+        };
+
+        const syncData = () => {
+            if (!user) return;
+            onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'stats', 'overall'), (s) => {
+                if(s.exists()) {
+                    const data = s.data();
+                    globalTotals = { total: data.total || 0, lgbt: data.lgbt || 0, ally: data.ally || 0 };
+                    
+                    document.getElementById('stat-total').innerText = globalTotals.total;
+                    document.getElementById('stat-lgbt').innerText = globalTotals.lgbt;
+                    document.getElementById('stat-ally').innerText = globalTotals.ally;
+                    
+                    flatData = [];
+                    const tree = data.tree || {};
+                    for(const dist in tree) {
+                        for(const gen in tree[dist]) {
+                            for(const sex in tree[dist][gen]) {
+                                flatData.push({ dist: dist, g: gen, s: sex, count: tree[dist][gen][sex] });
+                            }
+                        }
+                    }
+                    renderFilterPills(); 
+                    updateDataDisplay();
+                } else {
+                    setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'stats', 'overall'), { total: 0, lgbt: 0, ally: 0, tree: {} });
+                }
+            });
+        };
+
+        window.toggleFiltersPanel = () => {
+            const panel = document.getElementById('filters-panel');
+            panel.classList.toggle('hidden');
+            document.getElementById('btn-toggle-filter').setAttribute('aria-expanded', !panel.classList.contains('hidden'));
+        };
+
+        window.toggleExpand = (id) => {
+            const el = document.getElementById(id);
+            if(el.classList.contains('expanded')) {
+                el.classList.remove('expanded');
+            } else {
+                document.querySelectorAll('.expand-content').forEach(c => c.classList.remove('expanded'));
+                el.classList.add('expanded');
+            }
+        };
+
+        window.setGrouping = (grp) => {
+            currentGrouping = grp;
+            ['districts', 'genders', 'sexualities'].forEach(id => {
+                const el = document.getElementById(`grp-${id}`);
+                if (id === grp) {
+                    el.className = 'whitespace-nowrap px-4 py-2 border rounded-full text-xs font-black uppercase tracking-wider transition-colors bg-purple-600 text-white border-purple-600 ui-f' + (id==='districts'?1:id==='genders'?2:3);
+                    el.setAttribute('aria-checked', 'true');
+                } else {
+                    el.className = 'whitespace-nowrap px-4 py-2 border rounded-full text-xs font-black uppercase tracking-wider transition-colors bg-slate-50 text-slate-600 border-slate-200 ui-f' + (id==='districts'?1:id==='genders'?2:3);
+                    el.setAttribute('aria-checked', 'false');
+                }
+            });
+            updateDataDisplay();
+        };
+
+        window.renderFilterPills = () => {
+            let orderedDistricts = [...DISTRICTS];
+            if (mySubmission && mySubmission.dist) {
+                orderedDistricts = orderedDistricts.filter(dist => dist !== mySubmission.dist);
+                orderedDistricts.unshift(mySubmission.dist);
+            }
+            let distsToRender = orderedDistricts;
+            let moreCount = 0;
+            if (!showAllDistricts && orderedDistricts.length > 5) {
+                distsToRender = orderedDistricts.slice(0, 5);
+                moreCount = orderedDistricts.length - 5;
+            }
+
+            const baseGen = [...GENDER_OPTS, ...TRANS_OPTS].map(o=>o.id).filter(id=>id!=='More');
+            const dbGen = Array.from(new Set(flatData.filter(x => x.count > 0).map(x => x.g)));
+            let gendersToRender = Array.from(new Set([...baseGen, ...dbGen])).sort();
+            if (mySubmission && mySubmission.g && gendersToRender.includes(mySubmission.g)) {
+                gendersToRender = gendersToRender.filter(g => g !== mySubmission.g);
+                gendersToRender.unshift(mySubmission.g);
+            }
+
+            const baseSex = SEXUALITY_OPTS.map(o=>o.id).filter(id=>id!=='More');
+            const dbSex = Array.from(new Set(flatData.filter(x => x.count > 0).map(x => x.s)));
+            let sexualitiesToRender = Array.from(new Set([...baseSex, ...dbSex])).sort();
+            if (mySubmission && mySubmission.s && sexualitiesToRender.includes(mySubmission.s)) {
+                sexualitiesToRender = sexualitiesToRender.filter(s => s !== mySubmission.s);
+                sexualitiesToRender.unshift(mySubmission.s);
+            }
+
+            const buildHtml = (type, arr) => {
+                return arr.map(id => {
+                    const isActive = activeFilters[type].includes(id);
+                    const baseCls = "whitespace-nowrap px-3 py-1.5 border rounded-full text-[10px] font-bold uppercase tracking-wider transition-colors cursor-pointer shrink-0 focus:outline-none focus:ring-2 focus:ring-purple-500";
+                    const cls = isActive ? `${baseCls} bg-purple-600 text-white border-purple-600 shadow-sm` : `${baseCls} bg-white text-slate-600 border-slate-200 hover:bg-slate-50`;
+                    return `<button onclick="toggleFilter('${type}', '${id.replace(/'/g, "\\'")}')" class="${cls}">${id}</button>`;
+                }).join('');
+            };
+
+            let distHtml = buildHtml('districts', distsToRender);
+            if (!showAllDistricts && moreCount > 0) {
+                distHtml += `<button onclick="toggleAllDistricts()" class="whitespace-nowrap px-3 py-1.5 border border-dashed border-slate-300 rounded-full text-[10px] font-bold uppercase tracking-wider text-slate-500 hover:bg-slate-50 shrink-0">+${moreCount} More</button>`;
+            } else if (showAllDistricts) {
+                distHtml += `<button onclick="toggleAllDistricts()" class="whitespace-nowrap px-3 py-1.5 border border-dashed border-slate-300 rounded-full text-[10px] font-bold uppercase tracking-wider text-slate-500 hover:bg-slate-50 shrink-0">Less</button>`;
+            }
+
+            document.getElementById('filter-row-dist').innerHTML = distHtml;
+            document.getElementById('filter-row-gen').innerHTML = buildHtml('genders', gendersToRender);
+            document.getElementById('filter-row-sex').innerHTML = buildHtml('sexualities', sexualitiesToRender);
+            
+            const hasFilter = Object.values(activeFilters).some(arr => arr.length > 0);
+            document.getElementById('btn-clear-all').classList.toggle('hidden', !hasFilter);
+        };
+
+        window.toggleAllDistricts = () => { showAllDistricts = !showAllDistricts; renderFilterPills(); };
+
+        window.toggleFilter = (type, val) => {
+            const idx = activeFilters[type].indexOf(val);
+            if (idx > -1) activeFilters[type].splice(idx, 1);
+            else activeFilters[type].push(val);
+            renderFilterPills();
+            updateDataDisplay();
+        };
+
+        window.clearAllFilters = () => {
+            activeFilters = { districts: [], genders: [], sexualities: [] };
+            renderFilterPills();
+            updateDataDisplay();
+        };
+
+        window.setViewType = (v) => {
+            currentView = v;
+            document.getElementById('view-list').className = v === 'list' ? 'px-3 py-1 text-[10px] md:text-xs font-black uppercase rounded-md bg-white shadow-sm text-slate-800' : 'px-3 py-1 text-[10px] md:text-xs font-black uppercase rounded-md text-slate-500 hover:text-slate-800 cursor-pointer';
+            document.getElementById('view-list').setAttribute('aria-pressed', v === 'list');
+            document.getElementById('view-chart').className = v === 'chart' ? 'px-3 py-1 text-[10px] md:text-xs font-black uppercase rounded-md bg-white shadow-sm text-slate-800' : 'px-3 py-1 text-[10px] md:text-xs font-black uppercase rounded-md text-slate-500 hover:text-slate-800 cursor-pointer';
+            document.getElementById('view-chart').setAttribute('aria-pressed', v === 'chart');
+            
+            document.getElementById('data-list-view').classList.toggle('hidden', v !== 'list');
+            document.getElementById('data-chart-view').classList.toggle('hidden', v !== 'chart');
+            updateDataDisplay();
+        };
+
+        window.setFormatType = (f) => {
+            currentFormat = f;
+            document.getElementById('format-num').className = f === 'num' ? 'px-3 py-1 text-[10px] font-black uppercase rounded-md bg-white shadow-sm text-slate-800' : 'px-3 py-1 text-[10px] font-black uppercase rounded-md text-slate-500 hover:text-slate-800 cursor-pointer';
+            document.getElementById('format-pct').className = f === 'pct' ? 'px-3 py-1 text-[10px] font-black uppercase rounded-md bg-white shadow-sm text-slate-800' : 'px-3 py-1 text-[10px] font-black uppercase rounded-md text-slate-500 hover:text-slate-800 cursor-pointer';
+            
+            if(currentView === 'chart' && mainChartInstance) {
+                mainChartInstance.options.plugins.tooltip.callbacks.label = (ctx) => ` ${ctx.raw}${currentFormat === 'pct' ? '%' : ''}`;
+                mainChartInstance.update('none'); 
+            }
+        };
+
+        const updateDataDisplay = () => {
+            
+            if (globalTotals.total === 0) {
+                const msg = "No data yet.";
+                document.getElementById('data-list-view').innerHTML = `<p class="text-xs text-center text-slate-500 mt-8 font-medium">${msg}</p>`;
+                document.getElementById('chart-container').innerHTML = `<p class="text-xs text-center text-slate-500 mt-20 font-medium">${msg}</p><canvas id="mainChart" class="hidden"></canvas>`;
+                if(mainChartInstance) { mainChartInstance.destroy(); mainChartInstance = null; }
+                return;
+            }
+
+            let grouped = {};
+            let subGroups = {}; 
+            
+            let filteredData = flatData.filter(item => {
+                if(activeFilters.districts.length > 0 && !activeFilters.districts.includes(item.dist)) return false;
+                if(activeFilters.genders.length > 0 && !activeFilters.genders.includes(item.g)) return false;
+                if(activeFilters.sexualities.length > 0 && !activeFilters.sexualities.includes(item.s)) return false;
+                return true;
+            });
+
+            let viewTotal = filteredData.reduce((sum, item) => sum + item.count, 0);
+
+            const grpMap = { 'districts': 'dist', 'genders': 'g', 'sexualities': 's' };
+            const pk = grpMap[currentGrouping];
+
+            filteredData.forEach(item => {
+                const key = item[pk];
+                grouped[key] = (grouped[key] || 0) + item.count;
+                
+                if(!subGroups[key]) subGroups[key] = { g: {}, s: {}, dist: {} };
+                if(pk !== 'dist') subGroups[key].dist[item.dist] = (subGroups[key].dist[item.dist] || 0) + item.count;
+                if(pk !== 'g') subGroups[key].g[item.g] = (subGroups[key].g[item.g] || 0) + item.count;
+                if(pk !== 's') subGroups[key].s[item.s] = (subGroups[key].s[item.s] || 0) + item.count;
+            });
+
+            let sortedItems = Object.keys(grouped)
+                .filter(k => grouped[k] > 0)
+                .map(key => ({ rawKey: key, label: key, count: grouped[key] }))
+                .sort((a, b) => a.label.localeCompare(b.label));
+
+            if(sortedItems.length === 0) { 
+                const msg = "No data matches filters.";
+                document.getElementById('data-list-view').innerHTML = `<p class="text-xs text-center text-slate-500 mt-8 font-medium">${msg}</p>`; 
+                document.getElementById('chart-container').innerHTML = `<p class="text-xs text-center text-slate-500 mt-20 font-medium">${msg}</p><canvas id="mainChart" class="hidden"></canvas>`;
+                if(mainChartInstance) { mainChartInstance.destroy(); mainChartInstance = null; }
+                return; 
+            }
+
+            if(currentView === 'list') {
+                const listEl = document.getElementById('data-list-view');
+                
+                listEl.innerHTML = sortedItems.map(item => {
+                    const subs = subGroups[item.rawKey];
+                    let subHtml = "";
+                    
+                    if(currentGrouping !== 'districts' && Object.keys(subs.dist).length > 0) {
+                        subHtml += `<p class="font-bold text-slate-800 mb-1 mt-2">District</p>`;
+                        Object.keys(subs.dist).filter(k=>subs.dist[k]>0).forEach(k => subHtml += `<div class="flex justify-between border-b border-slate-100 py-1"><span>${k}</span><span class="font-bold">${subs.dist[k]}</span></div>`);
+                    }
+                    if(currentGrouping !== 'genders' && Object.keys(subs.g).length > 0) {
+                        subHtml += `<p class="font-bold text-slate-800 mb-1 mt-2">Gender</p>`;
+                        Object.keys(subs.g).filter(k=>subs.g[k]>0).forEach(k => subHtml += `<div class="flex justify-between border-b border-slate-100 py-1"><span>${k}</span><span class="font-bold">${subs.g[k]}</span></div>`);
+                    }
+                    if(currentGrouping !== 'sexualities' && Object.keys(subs.s).length > 0) {
+                        subHtml += `<p class="font-bold text-slate-800 mb-1 mt-2">Sexuality</p>`;
+                        Object.keys(subs.s).filter(k=>subs.s[k]>0).forEach(k => subHtml += `<div class="flex justify-between border-b border-slate-100 py-1"><span>${k}</span><span class="font-bold">${subs.s[k]}</span></div>`);
+                    }
+
+                    return `
+                    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden mb-2 shadow-sm focus-within:ring-2 focus-within:ring-purple-500" id="card-${item.rawKey.replace(/\s+/g, '-')}">
+                        <button class="w-full p-4 flex justify-between items-center cursor-pointer hover:bg-slate-50 transition-colors outline-none" onclick="toggleExpand('expand-${item.rawKey.replace(/\s+/g, '-')}')" aria-expanded="false">
+                            <span class="font-bold text-slate-700 text-sm">${item.label}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-black bg-purple-100 text-purple-700 px-3 py-1 rounded-full">${item.count}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-400"><path d="m6 9 6 6 6-6"/></svg>
+                            </div>
+                        </button>
+                        <div id="expand-${item.rawKey.replace(/\s+/g, '-')}" class="expand-content bg-slate-50 px-4 text-xs text-slate-600 border-t border-slate-100">
+                            ${subHtml}
+                        </div>
+                    </div>
+                `}).join('');
+            } else {
+                const ctxContainer = document.getElementById('chart-container');
+                if(ctxContainer.querySelector('canvas').classList.contains('hidden')) {
+                    ctxContainer.innerHTML = `<canvas id="mainChart" aria-label="Data Chart" role="img"></canvas>`;
+                }
+                
+                const ctx = document.getElementById('mainChart').getContext('2d');
+                const chartLabels = sortedItems.map(i => i.label);
+                const chartData = sortedItems.map(i => currentFormat === 'pct' && viewTotal > 0 ? ((i.count/viewTotal)*100).toFixed(1) : i.count);
+                
+                if(mainChartInstance) {
+                    mainChartInstance.data.labels = chartLabels;
+                    mainChartInstance.data.datasets[0].data = chartData;
+                    mainChartInstance.options.plugins.tooltip.callbacks.label = (ctx) => ` ${ctx.raw}${currentFormat === 'pct' ? '%' : ''}`;
+                    mainChartInstance.update('none'); 
+                } else {
+                    mainChartInstance = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: chartLabels,
+                            datasets: [{ 
+                                data: chartData, 
+                                backgroundColor: ['#9333ea', '#c084fc', '#f472b6', '#38bdf8', '#fbbf24', '#a3e635', '#9ca3af', '#e2e8f0'], 
+                                borderWidth: 2, borderColor: '#ffffff' 
+                            }]
+                        },
+                        options: { 
+                            responsive: true, maintainAspectRatio: false, 
+                            plugins: { 
+                                legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10, family: 'sans-serif' } } },
+                                tooltip: { callbacks: { label: (ctx) => ` ${ctx.raw}${currentFormat === 'pct' ? '%' : ''}` } }
+                            } 
+                        }
+                    });
+                }
+            }
+        };
+
+        window.downloadDataImage = async () => {
+            const btnSpan = document.getElementById('ui-btn-save');
+            const orig = btnSpan.innerHTML; 
+            btnSpan.innerHTML = "...";
+            const targetId = currentView === 'list' ? 'data-list-view' : 'data-chart-view';
+            const wrapper = document.createElement('div');
+            wrapper.style.padding = '24px'; wrapper.style.backgroundColor = '#ffffff'; wrapper.style.width = '600px';
+            
+            const filterMap = { 'districts': 'District Breakdown', 'genders': 'Gender Identity Breakdown', 'sexualities': 'Sexual Identity Breakdown' };
+            wrapper.innerHTML = `
+                <h2 style="font-size:24px; font-weight:900; color:#1e293b; margin-bottom:4px; font-family:sans-serif; text-align:center;">LGBTQIA+ Census Punjab 2026</h2>
+                <p style="font-size:14px; color:#64748b; margin-bottom:24px; font-family:sans-serif; text-transform:uppercase; font-weight:bold; text-align:center;">${filterMap[currentGrouping]}</p>
+            `;
+            
+            if(currentView === 'chart') {
+                const img = document.createElement('img'); img.src = document.getElementById('mainChart').toDataURL('image/png'); img.style.width = '100%'; wrapper.appendChild(img);
+            } else wrapper.appendChild(document.getElementById(targetId).cloneNode(true));
+            
+            wrapper.innerHTML += `<p style="margin-top:24px; font-size:14px; color:#9333ea; font-weight:bold; font-family:sans-serif; text-align:center;">Source: Queer ਪੰਜਾਬ</p>`;
+            wrapper.style.position = 'absolute'; wrapper.style.left = '-9999px'; document.body.appendChild(wrapper);
+            
+            try {
+                const canvas = await html2canvas(wrapper, { scale: 2, backgroundColor: '#ffffff', logging: false });
+                const link = document.createElement('a'); link.download = `QueerPunjab_${Date.now()}.png`; link.href = canvas.toDataURL('image/png'); link.click();
+                showToast("Saved!");
+            } catch(e) {} finally { document.body.removeChild(wrapper); btnSpan.innerHTML = orig; }
+        };
+
+        const renderMySubmissionView = () => {
+            document.getElementById('actual-form-view').classList.add('hidden');
+            const v = document.getElementById('my-submission-view');
+            v.classList.remove('hidden');
+            
+            document.getElementById('my-entry-dist').innerText = mySubmission.dist;
+            document.getElementById('my-entry-g').innerText = mySubmission.g;
+            document.getElementById('my-entry-s').innerText = mySubmission.s;
+            
+            const editsLeft = 2 - (mySubmission.edits || 0);
+            const btn = document.getElementById('btn-edit-entry');
+            if(editsLeft <= 0) {
+                btn.disabled = true;
+                btn.innerText = "Edits Locked";
+                btn.className = "flex-1 py-4 border-2 border-slate-300 text-slate-400 font-black rounded-[1.5rem] uppercase tracking-widest text-xs";
+            } else {
+                btn.disabled = false;
+                btn.innerText = `Edit Entry (${editsLeft} left)`;
+                btn.className = "flex-1 py-4 border-2 border-purple-600 text-purple-700 font-black rounded-[1.5rem] active:scale-95 transition-transform uppercase tracking-widest text-xs focus:outline-none focus:ring-2 focus:ring-purple-500";
+            }
+        };
+
+        window.enableEdit = () => {
+            document.getElementById('my-submission-view').classList.add('hidden');
+            document.getElementById('actual-form-view').classList.remove('hidden');
+        };
+
+        window.deleteMyCount = async () => {
+            if(!user || !mySubmission) return;
+            showToast("Deleting...");
+            
+            try {
+                const updates = {};
+                updates[`tree.${mySubmission.dist}.${mySubmission.g}.${mySubmission.s}`] = increment(-1);
+                updates[mySubmission.isAlly ? 'ally' : 'lgbt'] = increment(-1);
+                updates['total'] = increment(-1);
+                
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'stats', 'overall'), updates);
+                await deleteDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'submissions', 'entry'));
+                
+                mySubmission = null;
+                showToast("Count deleted.");
+                
+                document.getElementById('my-submission-view').classList.add('hidden');
+                document.getElementById('actual-form-view').classList.remove('hidden');
+                document.getElementById('census-form').reset();
+                clearTransSub();
+                document.getElementById('sub-more-gender').classList.add('hidden');
+                document.getElementById('sub-more-sexuality').classList.add('hidden');
+                
+                renderFilterPills();
+                renderAiChips();
+                
+            } catch (e) {
+                showToast("Error deleting.");
+            }
+        };
+
+        window.handleFormSubmit = async (e) => {
+            e.preventDefault();
+            if (!user) { showToast("Connecting to secure server..."); return; }
+            
+            let g = document.querySelector('input[name="gender"]:checked')?.value;
+            let s = document.querySelector('input[name="sexuality"]:checked')?.value;
+            const dist = document.getElementById('district-select').value;
+            
+            if (!g || !s || !dist) { showToast("Please complete all sections."); return; }
+
+            if ((g === 'Man' && s === 'Lesbian') || (g === 'Woman' && s === 'Gay')) {
+                showToast("Wrong Combination"); return;
+            }
+
+            if(g === 'Transgender') {
+                const subT = document.querySelector('input[name="gender_trans"]:checked')?.value;
+                if(subT) g = subT; 
+            } else if (g === 'More') {
+                const cG = document.getElementById('input-more-gender').value.trim();
+                if(cG) g = cG; else { showToast("Please specify gender."); return; }
+            }
+
+            if (s === 'More') {
+                const cS = document.getElementById('input-more-sexuality').value.trim();
+                if(cS) s = cS; else { showToast("Please specify sexuality."); return; }
+            }
+
+            if (mySubmission && mySubmission.g === g && mySubmission.s === s && mySubmission.dist === dist) {
+                showToast("No changes made.");
+                setTab('dashboard');
+                renderMySubmissionView();
+                return;
+            }
+
+            const isAlly = (g === 'Man' || g === 'Woman') && s === 'Heterosexual';
+            const btn = document.getElementById('btn-submit'); btn.disabled = true; btn.innerText = "...";
+
+            try {
+                const updates = {};
+                const editsUsed = mySubmission ? (mySubmission.edits || 0) + 1 : 0;
+                
+                let allyDiff = 0;
+                let lgbtDiff = 0;
+
+                if (mySubmission) {
+                    updates[`tree.${mySubmission.dist}.${mySubmission.g}.${mySubmission.s}`] = increment(-1);
+                    if(mySubmission.isAlly) allyDiff -= 1; else lgbtDiff -= 1;
+                } else {
+                    updates['total'] = increment(1);
+                }
+
+                updates[`tree.${dist}.${g}.${s}`] = increment(1); 
+                if(isAlly) allyDiff += 1; else lgbtDiff += 1;
+
+                if(allyDiff !== 0) updates['ally'] = increment(allyDiff);
+                if(lgbtDiff !== 0) updates['lgbt'] = increment(lgbtDiff);
+                
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'stats', 'overall'), updates);
+                
+                mySubmission = { g, s, dist, isAlly, ts: Date.now(), edits: editsUsed };
+                await setDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'submissions', 'entry'), mySubmission);
+                
+                showToast("Counted Successfully!"); 
+                renderMySubmissionView();
+                renderFilterPills();
+                renderAiChips();
+                
+                setTab('dashboard');
+                setTimeout(() => {
+                    clearAllFilters(); 
+                    
+                    if (currentView === 'list') {
+                        let targetVal = dist;
+                        if(currentGrouping === 'genders') targetVal = g;
+                        if(currentGrouping === 'sexualities') targetVal = s;
+                        
+                        const targetId = `card-${targetVal.replace(/\s+/g, '-')}`;
+                        const card = document.getElementById(targetId);
+                        if(card) {
+                            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            const expandContent = document.getElementById(`expand-${targetVal.replace(/\s+/g, '-')}`);
+                            if (expandContent && !expandContent.classList.contains('expanded')) {
+                                toggleExpand(`expand-${targetVal.replace(/\s+/g, '-')}`);
+                            }
+                        }
+                    } else {
+                        const chartContainer = document.getElementById('data-chart-view');
+                        if(chartContainer) chartContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 400);
+
+            } catch (err) { showToast("Network error."); console.log(err); } finally { btn.disabled = false; btn.innerText = "Submit Count"; }
+        };
+
+        // --- AI ASSISTANT FULLSCREEN & LOGIC ---
+        window.openAiFullscreen = () => {
+            document.getElementById('ai-fullscreen-modal').classList.remove('hidden');
+            document.getElementById('ai-fullscreen-modal').classList.add('flex');
+            setTimeout(() => document.getElementById('ai-input-large').focus(), 50);
+        };
+
+        window.closeAiFullscreen = () => {
+            document.getElementById('ai-fullscreen-modal').classList.add('hidden');
+            document.getElementById('ai-fullscreen-modal').classList.remove('flex');
+        };
+
+        window.renderAiChips = () => {
+            let prompts = ["Show gender breakdown", "What is total participation?", "Analyze data trends"];
+            if (mySubmission) {
+                prompts = [
+                    `Show chart of sexualities in ${mySubmission.dist}`,
+                    `How many people identify as ${mySubmission.g}?`,
+                    `Analyze data for ${mySubmission.dist}`
+                ];
+            }
+            
+            document.getElementById('ai-chips').innerHTML = prompts.map(p => 
+                `<button onclick="sendAiMessage('${p}')" class="whitespace-nowrap px-4 py-2 bg-slate-100 border border-slate-200 rounded-full text-[10px] font-bold text-slate-700 uppercase tracking-wider hover:bg-slate-200 transition-colors shadow-sm shrink-0 focus:outline-none focus:ring-2 focus:ring-purple-500">${p}</button>`
+            ).join('');
+        };
+
+        window.sendAiMessageFromFullscreen = () => {
+            const inputEl = document.getElementById('ai-input-large');
+            const text = inputEl.value.trim();
+            if (text) {
+                inputEl.value = '';
+                closeAiFullscreen();
+                sendAiMessage(text);
+            }
+        };
+
+        window.sendAiMessage = async (presetText = null) => {
+            const text = presetText;
+            if (!text) return;
+
+            const chat = document.getElementById('chat-history');
+            chat.innerHTML += `<div class="flex justify-end fade-in"><div class="bg-purple-600 text-white p-3 max-w-[85%] text-sm shadow-sm rounded-2xl rounded-tr-none">${text}</div></div>`;
+            chat.scrollTop = chat.scrollHeight;
+
+            const lId = 'l-' + Date.now();
+            chat.innerHTML += `<div id="${lId}" class="flex justify-start fade-in"><div class="bg-slate-100 text-slate-500 p-3 text-sm rounded-2xl rounded-tl-none shadow-sm">AI is analyzing...</div></div>`;
+            chat.scrollTop = chat.scrollHeight;
+
+            const sysPrompt = `You are an AI data assistant for LGBTQIA+ Census Punjab 2026. Just act as AI.
+            Current Data: Total ${globalTotals.total}, LGBT ${globalTotals.lgbt}, Allies ${globalTotals.ally}.
+            Raw breakdown: ${JSON.stringify(flatData)}
+            If user asks for a chart/visual, YOU MUST reply ONLY with a JSON block wrapped in \`\`\`json. 
+            Format: {"title": "Chart Title", "labels": ["L1", "L2"], "data": [10, 20]}
+            If a text question, answer concisely in 2-3 sentences.`;
+
+            let retries = 0, maxRetries = 3;
+            let aiResp = "Service unavailable.";
+
+            while (retries < maxRetries) {
+                try {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text }] }], systemInstruction: { parts: [{ text: sysPrompt }] } })
+                    });
+                    if (!res.ok) throw new Error();
+                    const d = await res.json(); 
+                    aiResp = d.candidates?.[0]?.content?.parts?.[0]?.text || "Error."; 
+                    break;
+                } catch (e) {
+                    if (retries === maxRetries - 1) break;
+                    await new Promise(r => setTimeout(r, 1500)); retries++;
+                }
+            }
+
+            document.getElementById(lId).remove();
+            
+            const jsonMatch = aiResp.match(/```json([\s\S]*?)```/);
+            if (jsonMatch) {
+                try {
+                    const chartInfo = JSON.parse(jsonMatch[1].trim());
+                    const cId = 'ai-chart-' + Date.now();
+                    chat.innerHTML += `
+                        <div class="flex justify-start fade-in w-full" id="wrap-${cId}">
+                            <div class="bg-white border border-slate-200 shadow-sm p-4 w-[90%] md:w-[70%] rounded-2xl rounded-tl-none relative">
+                                <button onclick="downloadAiChart('wrap-${cId}', '${chartInfo.title}')" class="absolute top-3 right-3 p-2 bg-slate-50 hover:bg-slate-100 text-purple-600 rounded-full shadow-sm transition-colors focus:outline-none" aria-label="Download Chart">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                </button>
+                                <p class="text-xs font-black text-slate-800 mb-3 uppercase tracking-widest text-center pr-8">${chartInfo.title}</p>
+                                <div class="h-48 relative w-full mb-3"><canvas id="${cId}"></canvas></div>
+                            </div>
+                        </div>`;
+                    
+                    setTimeout(() => {
+                        new Chart(document.getElementById(cId).getContext('2d'), {
+                            type: 'doughnut',
+                            data: { labels: chartInfo.labels, datasets: [{ data: chartInfo.data, backgroundColor: ['#9333ea', '#c084fc', '#f472b6', '#38bdf8', '#fbbf24', '#a3e635'], borderWidth: 2, borderColor: '#ffffff' }] },
+                            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } } }
+                        });
+                    }, 100);
+                } catch(err) {
+                    chat.innerHTML += `<div class="flex justify-start fade-in"><div class="bg-slate-100 text-slate-700 p-4 max-w-[85%] text-sm rounded-2xl rounded-tl-none shadow-sm">I couldn't generate that chart based on the data.</div></div>`;
+                }
+            } else {
+                chat.innerHTML += `<div class="flex justify-start fade-in"><div class="bg-slate-100 text-slate-800 p-4 max-w-[85%] text-sm leading-relaxed rounded-2xl rounded-tl-none shadow-sm">${aiResp.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')}</div></div>`;
+            }
+            chat.scrollTop = chat.scrollHeight;
+        };
+
+        window.downloadAiChart = async (wrapperId, title) => {
+            const targetEl = document.getElementById(wrapperId).children[0];
+            const clone = targetEl.cloneNode(true);
+            clone.removeChild(clone.firstElementChild); // Remove absolute download button
+            
+            const wrapper = document.createElement('div');
+            wrapper.style.padding = '24px'; wrapper.style.backgroundColor = '#ffffff'; wrapper.style.width = '600px';
+            wrapper.innerHTML = `
+                <h2 style="font-size:24px; font-weight:900; color:#1e293b; margin-bottom:4px; font-family:sans-serif; text-align:center;">LGBTQIA+ Census Punjab 2026</h2>
+                <p style="font-size:14px; color:#64748b; margin-bottom:24px; font-family:sans-serif; text-transform:uppercase; font-weight:bold; text-align:center;">${title}</p>
+            `;
+            
+            const canvasOrig = targetEl.querySelector('canvas');
+            const img = document.createElement('img'); 
+            img.src = canvasOrig.toDataURL('image/png'); 
+            img.style.width = '100%'; img.style.maxHeight = '400px'; img.style.objectFit = 'contain';
+            wrapper.appendChild(img);
+            
+            wrapper.innerHTML += `<p style="margin-top:24px; font-size:14px; color:#4f46e5; font-weight:bold; font-family:sans-serif; text-align:center;">Source: Queer ਪੰਜਾਬ | Generated by AI</p>`;
+            wrapper.style.position = 'absolute'; wrapper.style.left = '-9999px'; document.body.appendChild(wrapper);
+            
+            try {
+                const canvas = await html2canvas(wrapper, { scale: 2, backgroundColor: '#ffffff', logging: false });
+                const link = document.createElement('a'); link.download = `QueerPunjab_AI_${Date.now()}.png`; link.href = canvas.toDataURL('image/png'); link.click();
+                showToast("Saved!");
+            } catch(e) {} finally { document.body.removeChild(wrapper); }
+        };
+    </script>
+</body>
+</html>
+
